@@ -6,6 +6,10 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.prometheus.client.Histogram;
+import io.prometheus.client.exporter.PushGateway;
 import org.apache.log4j.spi.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,78 +33,81 @@ import com.aruna.samples.repository.BookRepository;
 @RequestMapping("/api/v1")
 public class BookService {
 
-	private final Logger LOG = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    private final Logger LOG = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-	@Autowired
-	private BookRepository bookRepo;
+    @Autowired
+    private BookRepository bookRepo;
 
-//	static final Histogram requestLatency = Histogram.build()
-//			.name("requests_latency_seconds").help("Request latency in seconds.").register();
+    static final Histogram requestLatency = Histogram.build()
+            .name("requests_latency_seconds").help("Request latency in seconds.").register();
 
-	@GetMapping("/books")
-	public List<Book> getAllBooks() {
+    // private MeterRegistry registry;
 
+    @GetMapping("/books")
+    public List<Book> getAllBooks() {
+        return (List<Book>) bookRepo.findAll();
+    }
 
+    @PostMapping("/books")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Timed(value = "books.create", histogram = true, percentiles = {0.95, 0.99}, extraTags = {"environment", "dev"},
+            description = "This is for the createBook API calls. Checking the description thing in Micrometer")
+    public ResponseEntity<?> createBook(@Valid @RequestBody Book book, UriComponentsBuilder uriBuilder) {
+        Book savedBook = bookRepo.save(book);
+        //TODO : To be replaced with logging here
+        System.out.println("book saved is " + savedBook);
 
+        // PushGateway
 
-		return (List<Book>) bookRepo.findAll();
-	}
+        URI location = uriBuilder.path("/api/v1/books/{id}").buildAndExpand(savedBook.getId()).toUri();
+        return ResponseEntity.created(location).build();
+    }
 
-	@PostMapping("/books")
-	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<?> createBook(@Valid @RequestBody Book book, UriComponentsBuilder uriBuilder) {
-		Book savedBook = bookRepo.save(book);
-		//TODO : To be replaced with logging here
-		System.out.println("book saved is " + savedBook);
-		URI location = uriBuilder.path("/api/v1/books/{id}").buildAndExpand(savedBook.getId()).toUri();
-		return ResponseEntity.created(location).build();
-	}
+    @GetMapping("/books/title/{bookTitle}")
+    public ResponseEntity<Object> findByTitle(@PathVariable String bookTitle) {
+        List<Book> books = bookRepo.findByTitle(bookTitle);
+        if (books != null && books.size() > 0) {
+            return ResponseEntity.ok(bookRepo.findByTitle(bookTitle));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-	@GetMapping("/books/title/{bookTitle}")
-	public ResponseEntity<Object> findByTitle(@PathVariable String bookTitle) {
-		List<Book> books = bookRepo.findByTitle(bookTitle);
-		if (books != null && books.size() > 0) {
-			return ResponseEntity.ok(bookRepo.findByTitle(bookTitle));
-		} else {
-			return ResponseEntity.notFound().build();
-		}
-	}
+    @GetMapping("/books/{id}")
+    public ResponseEntity<Book> findByIdentity(@PathVariable Long id) {
+        Optional<Book> bookOpt = Optional.ofNullable(bookRepo.findOne(id));
 
-	@GetMapping("/books/{id}")
-	public ResponseEntity<Book> findByIdentity(@PathVariable Long id) {
-		Optional<Book> bookOpt = Optional.ofNullable(bookRepo.findOne(id));
+        if (bookOpt.isPresent()) {
+            return ResponseEntity.ok(bookOpt.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-		if (bookOpt.isPresent()) {
-			return ResponseEntity.ok(bookOpt.get());
-		} else {
-			return ResponseEntity.notFound().build();
-		}
-	}
+    @PutMapping("/books/{id}")
+    public ResponseEntity<Object> updateStudent(@RequestBody Book book, @PathVariable long id) {
 
-	@PutMapping("/books/{id}")
-	public ResponseEntity<Object> updateStudent(@RequestBody Book book, @PathVariable long id) {
+        Optional<Book> bookOpt = Optional.ofNullable(bookRepo.findOne(id));
 
-		Optional<Book> bookOpt = Optional.ofNullable(bookRepo.findOne(id));
+        if (!bookOpt.isPresent())
+            return ResponseEntity.notFound().build();
 
-		if (!bookOpt.isPresent())
-			return ResponseEntity.notFound().build();
+        bookRepo.save(book);
 
-		bookRepo.save(book);
+        return ResponseEntity.noContent().build();
+    }
 
-		return ResponseEntity.noContent().build();
-	}
+    @DeleteMapping("/books/{id}")
+    public ResponseEntity<?> deleteBook(@PathVariable long id) {
+        Book book = bookRepo.findOne(id);
 
-	@DeleteMapping("/books/{id}")
-	public ResponseEntity<?> deleteBook(@PathVariable long id) {
-		Book book = bookRepo.findOne(id);
+        if (book == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-		if (book == null) {
-			return ResponseEntity.notFound().build();
-		} 
+        bookRepo.delete(book);
 
-		bookRepo.delete(book);
-
-		return ResponseEntity.ok().build();
-	}
+        return ResponseEntity.ok().build();
+    }
 
 }

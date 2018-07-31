@@ -26,4 +26,4 @@ management:
 
 endpoints: 
   prometheus: 
-    id:      prometheus
+    id: prometheus
