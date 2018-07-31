@@ -14,8 +14,10 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Histogram;
+import io.prometheus.client.SimpleCollector;
 import io.prometheus.client.exporter.PushGateway;
 import org.apache.log4j.spi.LoggerFactory;
 import org.slf4j.Logger;
@@ -45,21 +47,36 @@ public class BookService {
     @Autowired
     private BookRepository bookRepo;
 
-    CollectorRegistry registry = new CollectorRegistry();
-
     PushGateway pushGateway;
     public BookService() {
         pushGateway = new PushGateway("10.100.214.175:9091");
     }
 
     @GetMapping("/books")
+    @Timed(value = "books.retrieveAll", histogram = true, percentiles = {0.95, 0.99}, extraTags = {"environment", "dev"},
+            description = "This is for retrieving all books from the API")
     public List<Book> getAllBooks() {
         try {
-            MeterRegistry meterRegistry = new SimpleMeterRegistry();
-            Counter.builder("http.requests").register(meterRegistry).increment();
-            Metrics.addRegistry(meterRegistry);
-            pushGateway.pushAdd(CollectorRegistry.defaultRegistry, "http.requests");
+            Metrics.counter("http.requests").increment();
+
+            double count = Metrics.counter("http.requests").count();
+            System.out.println("Count is: " + count);
+            // Metrics.globalRegistry.
+
+
+            // pushGateway.pushAdd(, "test");
+            // pushGateway.push(Metrics.globalRegistry);
+
+
             return (List<Book>) bookRepo.findAll();
+
+
+
+//            MeterRegistry meterRegistry = new SimpleMeterRegistry();
+//            Counter.builder("http.requests").register(registry).increment();
+//            Metrics.addRegistry(meterRegistry);
+//            pushGateway.pushAdd(CollectorRegistry.defaultRegistry, "http.requests");
+
         } catch(Exception e) {
             e.printStackTrace();
             return new ArrayList<>();
