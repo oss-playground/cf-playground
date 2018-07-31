@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: StatelessBookService
+  resources:
+    cache-period: 3600
+    
+  h2:
+   console:
+     enabled: true
+
+#application:
+#  seal:
+#    id: 85974
+#
+#logging:
+#  config: classpath:com/jpmorgan/am/cca/moneta/boot/logging/logback/logback.xml
+
+management: 
+  security:
+    enabled: false
+  metrics:
+    web:
+      server:
+        auto-time-requests: false 
+        
+
+endpoints: 
+  prometheus: 
+    id:      prometheus
