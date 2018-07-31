@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
+import javax.xml.ws.Response;
 
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -53,14 +54,21 @@ public class BookService {
     @Timed(value = "books.create", histogram = true, percentiles = {0.95, 0.99}, extraTags = {"environment", "dev"},
             description = "This is for the createBook API calls. Checking the description thing in Micrometer")
     public ResponseEntity<?> createBook(@Valid @RequestBody Book book, UriComponentsBuilder uriBuilder) {
-        Book savedBook = bookRepo.save(book);
-        //TODO : To be replaced with logging here
-        System.out.println("book saved is " + savedBook);
+        try {
+            Book savedBook = bookRepo.save(book);
+            //TODO : To be replaced with logging here
+            System.out.println("book saved is " + savedBook);
 
-        // PushGateway
+            PushGateway pushGateway = new PushGateway("10.100.214.175:9091");
+            pushGateway.pushAdd(requestLatency, "latency_job");
 
-        URI location = uriBuilder.path("/api/v1/books/{id}").buildAndExpand(savedBook.getId()).toUri();
-        return ResponseEntity.created(location).build();
+            URI location = uriBuilder.path("/api/v1/books/{id}").buildAndExpand(savedBook.getId()).toUri();
+            return ResponseEntity.created(location).build();
+        } catch(Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
     @GetMapping("/books/title/{bookTitle}")
