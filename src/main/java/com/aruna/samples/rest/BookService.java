@@ -1,14 +1,20 @@
 package com.aruna.samples.rest;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
 import javax.xml.ws.Response;
 
+import ch.qos.logback.core.encoder.EchoEncoder;
 import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Histogram;
 import io.prometheus.client.exporter.PushGateway;
 import org.apache.log4j.spi.LoggerFactory;
@@ -39,14 +45,25 @@ public class BookService {
     @Autowired
     private BookRepository bookRepo;
 
-    static final Histogram requestLatency = Histogram.build()
-            .name("requests_latency_seconds").help("Request latency in seconds.").register();
+    CollectorRegistry registry = new CollectorRegistry();
 
-    // private MeterRegistry registry;
+    PushGateway pushGateway;
+    public BookService() {
+        pushGateway = new PushGateway("10.100.214.175:9091");
+    }
 
     @GetMapping("/books")
     public List<Book> getAllBooks() {
-        return (List<Book>) bookRepo.findAll();
+        try {
+            MeterRegistry meterRegistry = new SimpleMeterRegistry();
+            Counter.builder("http.requests").register(meterRegistry).increment();
+            Metrics.addRegistry(meterRegistry);
+            pushGateway.pushAdd(CollectorRegistry.defaultRegistry, "http.requests");
+            return (List<Book>) bookRepo.findAll();
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     @PostMapping("/books")
@@ -59,7 +76,8 @@ public class BookService {
             //TODO : To be replaced with logging here
             System.out.println("book saved is " + savedBook);
 
-            PushGateway pushGateway = new PushGateway("10.100.214.175:9091");
+            final Histogram requestLatency = Histogram.build()
+                    .name("requests_latency_seconds").help("Request latency in seconds.").register();
             pushGateway.pushAdd(requestLatency, "latency_job");
 
             URI location = uriBuilder.path("/api/v1/books/{id}").buildAndExpand(savedBook.getId()).toUri();

@@ -9,7 +9,7 @@ public class MicrometerConfiguration {
 
     MeterRegistryCustomizer<MeterRegistry> meterRegistryCustomizer(MeterRegistry meterRegistry) {
         return mReg -> {
-            meterRegistry.config().commonTags("application", "statelessBookService");
+            meterRegistry.config().commonTags("application", "statelessBookService").commonTags("instance", "instance_index_value");
         };
     }
 
