@@ -1,6 +1,7 @@
 package com.aruna.samples.rest;
 
 import java.net.URI;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,12 +11,12 @@ import javax.xml.ws.Response;
 
 import ch.qos.logback.core.encoder.EchoEncoder;
 import io.micrometer.core.annotation.Timed;
-import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
+import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import io.prometheus.client.SimpleCollector;
 import io.prometheus.client.exporter.PushGateway;
@@ -57,24 +58,9 @@ public class BookService {
             description = "This is for retrieving all books from the API")
     public List<Book> getAllBooks() {
         try {
-
-//            Metrics.counter("http.requests").increment();
-//            double count = Metrics.counter("http.requests").count();
-//            System.out.println("Count is: " + count);
-            // Metrics.globalRegistry.
-
-            // pushGateway.pushAdd(, "test");
-            // pushGateway.push(Metrics.globalRegistry);
-            
+        	final Counter requests = Counter.build().name("requests_total").help("Total Number of Request").labelNames("/books/get").register();
+        	pushGateway.pushAdd(requests, "total_requests");
             return (List<Book>) bookRepo.findAll();
-
-
-
-//            MeterRegistry meterRegistry = new SimpleMeterRegistry();
-//            Counter.builder("http.requests").register(registry).increment();
-//            Metrics.addRegistry(meterRegistry);
-//            pushGateway.pushAdd(CollectorRegistry.defaultRegistry, "http.requests");
-
         } catch(Exception e) {
             e.printStackTrace();
             return new ArrayList<>();
@@ -88,13 +74,10 @@ public class BookService {
     public ResponseEntity<?> createBook(@Valid @RequestBody Book book, UriComponentsBuilder uriBuilder) {
         try {
             Book savedBook = bookRepo.save(book);
-            //TODO : To be replaced with logging here
             System.out.println("book saved is " + savedBook);
-
-//            final Histogram requestLatency = Histogram.build()
-//                    .name("requests_latency_seconds").help("Request latency in seconds.").register();
-//            pushGateway.pushAdd(requestLatency, "latency_job");
-
+            final Histogram requestLatency = Histogram.build().labelNames("endpoint", "/books/post")
+                    .name("requests_latency_seconds").help("Request latency in seconds.").register();
+            pushGateway.pushAdd(requestLatency, "latency_job");
             URI location = uriBuilder.path("/api/v1/books/{id}").buildAndExpand(savedBook.getId()).toUri();
             return ResponseEntity.created(location).build();
         } catch(Exception e) {

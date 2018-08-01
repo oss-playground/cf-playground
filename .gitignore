@@ -1,6 +1,8 @@
 .idea
 .mvn\
 
+.classpath
+
 target/*
 target
 
