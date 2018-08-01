@@ -57,17 +57,15 @@ public class BookService {
             description = "This is for retrieving all books from the API")
     public List<Book> getAllBooks() {
         try {
-            Metrics.counter("http.requests").increment();
 
-            double count = Metrics.counter("http.requests").count();
-            System.out.println("Count is: " + count);
+//            Metrics.counter("http.requests").increment();
+//            double count = Metrics.counter("http.requests").count();
+//            System.out.println("Count is: " + count);
             // Metrics.globalRegistry.
-
 
             // pushGateway.pushAdd(, "test");
             // pushGateway.push(Metrics.globalRegistry);
-
-
+            
             return (List<Book>) bookRepo.findAll();
 
 
@@ -93,9 +91,9 @@ public class BookService {
             //TODO : To be replaced with logging here
             System.out.println("book saved is " + savedBook);
 
-            final Histogram requestLatency = Histogram.build()
-                    .name("requests_latency_seconds").help("Request latency in seconds.").register();
-            pushGateway.pushAdd(requestLatency, "latency_job");
+//            final Histogram requestLatency = Histogram.build()
+//                    .name("requests_latency_seconds").help("Request latency in seconds.").register();
+//            pushGateway.pushAdd(requestLatency, "latency_job");
 
             URI location = uriBuilder.path("/api/v1/books/{id}").buildAndExpand(savedBook.getId()).toUri();
             return ResponseEntity.created(location).build();
