@@ -54,7 +54,7 @@ public class BookService {
 
     public BookService() {
         pushGateway = new PushGateway("pushgateway.apps.dev.hk-1a.gaia.jpmchase.net");
-        requests = Counter.build().name("requests_total").help("Total Number of Request").labelNames("/books/get").register();
+        requests = Counter.build().name("requests_total").help("Total Number of Request").labelNames("books_get").register();
     }
 
     @GetMapping("/books")
@@ -79,7 +79,7 @@ public class BookService {
         try {
             Book savedBook = bookRepo.save(book);
             System.out.println("book saved is " + savedBook);
-            final Histogram requestLatency = Histogram.build().labelNames("endpoint", "/books/post")
+            final Histogram requestLatency = Histogram.build().labelNames("endpoint", "books_post")
                     .name("requests_latency_seconds").help("Request latency in seconds.").register();
             pushGateway.pushAdd(requestLatency, "latency_job");
             URI location = uriBuilder.path("/api/v1/books/{id}").buildAndExpand(savedBook.getId()).toUri();
