@@ -15,7 +15,7 @@ public class ServiceController {
     public static  final Histogram requestLatency = Histogram.build().name("requests_latency_seconds")
             .help("Request latency in seconds").register();
 
-    @RequestMapping(value = {"/hello/world"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"metrics"}, method = RequestMethod.GET)
     public Response getMetrics() {
         try {
 
