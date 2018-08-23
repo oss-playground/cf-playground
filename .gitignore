@@ -3,8 +3,6 @@
 
 .classpath
 
-target/*
-target
 
 mydukan-api/\.settings/
 
