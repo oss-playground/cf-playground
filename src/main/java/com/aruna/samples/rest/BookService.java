@@ -49,10 +49,11 @@ public class BookService {
     private BookRepository bookRepo;
 
     static Counter requests;
-    
+
     PushGateway pushGateway;
+
     public BookService() {
-        pushGateway = new PushGateway("10.100.214.175:9091");
+        pushGateway = new PushGateway("pushgateway.apps.dev.hk-1a.gaia.jpmchase.net");
         requests = Counter.build().name("requests_total").help("Total Number of Request").labelNames("/books/get").register();
     }
 
@@ -61,10 +62,10 @@ public class BookService {
             description = "This is for retrieving all books from the API")
     public List<Book> getAllBooks() {
         try {
-        	requests.labels("booksGet").inc();
-        	pushGateway.pushAdd(requests, "total_requests");
+            requests.labels("booksGet").inc();
+            pushGateway.pushAdd(requests, "total_requests");
             return (List<Book>) bookRepo.findAll();
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList<>();
         }
@@ -83,7 +84,7 @@ public class BookService {
             pushGateway.pushAdd(requestLatency, "latency_job");
             URI location = uriBuilder.path("/api/v1/books/{id}").buildAndExpand(savedBook.getId()).toUri();
             return ResponseEntity.created(location).build();
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
@@ -102,22 +103,22 @@ public class BookService {
 
     @GetMapping("/books/{id}")
     public ResponseEntity<Book> findByIdentity(@PathVariable Long id) {
-    	try {
-    		Optional<Book> bookOpt = Optional.ofNullable(bookRepo.findOne(id));
-            
+        try {
+            Optional<Book> bookOpt = Optional.ofNullable(bookRepo.findOne(id));
+
             requests.labels("booksGetById").inc();
             pushGateway.pushAdd(requests, "total_requests");
-            
+
             if (bookOpt.isPresent()) {
                 return ResponseEntity.ok(bookOpt.get());
             } else {
                 return ResponseEntity.notFound().build();
             }
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    		return ResponseEntity.badRequest().build();
-    	}
-        
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
     @PutMapping("/books/{id}")
