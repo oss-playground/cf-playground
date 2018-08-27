@@ -129,7 +129,7 @@ public class BookService {
             Optional<Book> bookOpt = Optional.ofNullable(bookRepo.findOne(id));
 
             requests.labels("books.id", "GET").inc();
-            pushGateway.pushAdd(requests, "total_requests");
+            pushGateway.pushAdd(requests, "requests_count");
 
             if (bookOpt.isPresent()) {
                 return ResponseEntity.ok(bookOpt.get());
@@ -149,7 +149,7 @@ public class BookService {
             Optional<Book> bookOpt = Optional.ofNullable(bookRepo.findOne(id));
 
             requests.labels("books.id", "PUT").inc();
-            pushGateway.pushAdd(requests, "total_requests");
+            pushGateway.pushAdd(requests, "requests_count");
 
             if (!bookOpt.isPresent())
                 return ResponseEntity.notFound().build();
@@ -169,7 +169,7 @@ public class BookService {
             Book book = bookRepo.findOne(id);
 
             requests.labels("books.id", "DELETE").inc();
-            pushGateway.pushAdd(requests, "total_requests");
+            pushGateway.pushAdd(requests, "requests_count");
 
             if (book == null) {
                 return ResponseEntity.notFound().build();
