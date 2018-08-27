@@ -50,11 +50,20 @@ public class BookService {
 
     static Counter requests;
 
+    static Histogram requestLatency;
+
     PushGateway pushGateway;
 
     public BookService() {
-        pushGateway = new PushGateway("pushgateway.apps.dev.hk-1a.gaia.jpmchase.net");
-        requests = Counter.build().name("requests_total").help("Total Number of Request").labelNames("books_get").register();
+        pushGateway = new PushGateway("10.100.214.175:9091");
+
+        // setting up the counter for all request endpoints
+        requests = Counter.build().name("requests_count").help("Total Number of Requests for each endpoint").
+                labelNames("endpoint", "type").register();
+
+//        // setting up the histogram for request latency on all endpoints
+//        requestLatency = Histogram.build().name("requests_latency_seconds").help("Request latency in seconds.")..register();
+//        pushGateway.pushAdd(requestLatency, "latency_job");
     }
 
     @GetMapping("/books")
@@ -62,8 +71,8 @@ public class BookService {
             description = "This is for retrieving all books from the API")
     public List<Book> getAllBooks() {
         try {
-            requests.labels("booksGet").inc();
-            pushGateway.pushAdd(requests, "total_requests");
+            requests.labels("books.retrieveAll", "GET").inc();
+            pushGateway.pushAdd(requests, "requests_count");
             return (List<Book>) bookRepo.findAll();
         } catch (Exception e) {
             e.printStackTrace();
@@ -79,26 +88,39 @@ public class BookService {
         try {
             Book savedBook = bookRepo.save(book);
             System.out.println("book saved is " + savedBook);
-            final Histogram requestLatency = Histogram.build().labelNames("endpoint", "books_post")
-                    .name("requests_latency_seconds").help("Request latency in seconds.").register();
-            pushGateway.pushAdd(requestLatency, "latency_job");
+
+            // first the count of the requests
+            requests.labels("books.create", "POST").inc();
+            pushGateway.pushAdd(requests, "requests_count");
+
             URI location = uriBuilder.path("/api/v1/books/{id}").buildAndExpand(savedBook.getId()).toUri();
             return ResponseEntity.created(location).build();
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(500).build();
         }
 
     }
 
     @GetMapping("/books/title/{bookTitle}")
     public ResponseEntity<Object> findByTitle(@PathVariable String bookTitle) {
-        List<Book> books = bookRepo.findByTitle(bookTitle);
-        if (books != null && books.size() > 0) {
-            return ResponseEntity.ok(bookRepo.findByTitle(bookTitle));
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            List<Book> books = bookRepo.findByTitle(bookTitle);
+
+            // count of get books by title
+            requests.labels("books.title", "GET").inc();
+            pushGateway.pushAdd(requests, "requests_count");
+
+            if (books != null && books.size() > 0) {
+                return ResponseEntity.ok(bookRepo.findByTitle(bookTitle));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
         }
+
     }
 
     @GetMapping("/books/{id}")
@@ -106,7 +128,7 @@ public class BookService {
         try {
             Optional<Book> bookOpt = Optional.ofNullable(bookRepo.findOne(id));
 
-            requests.labels("booksGetById").inc();
+            requests.labels("books.id", "GET").inc();
             pushGateway.pushAdd(requests, "total_requests");
 
             if (bookOpt.isPresent()) {
@@ -116,35 +138,50 @@ public class BookService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(500).build();
         }
 
     }
 
     @PutMapping("/books/{id}")
     public ResponseEntity<Object> updateStudent(@RequestBody Book book, @PathVariable long id) {
+        try {
+            Optional<Book> bookOpt = Optional.ofNullable(bookRepo.findOne(id));
 
-        Optional<Book> bookOpt = Optional.ofNullable(bookRepo.findOne(id));
+            requests.labels("books.id", "PUT").inc();
+            pushGateway.pushAdd(requests, "total_requests");
 
-        if (!bookOpt.isPresent())
-            return ResponseEntity.notFound().build();
+            if (!bookOpt.isPresent())
+                return ResponseEntity.notFound().build();
 
-        bookRepo.save(book);
+            bookRepo.save(book);
 
-        return ResponseEntity.noContent().build();
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
     }
 
     @DeleteMapping("/books/{id}")
     public ResponseEntity<?> deleteBook(@PathVariable long id) {
-        Book book = bookRepo.findOne(id);
+        try {
+            Book book = bookRepo.findOne(id);
 
-        if (book == null) {
-            return ResponseEntity.notFound().build();
+            requests.labels("books.id", "DELETE").inc();
+            pushGateway.pushAdd(requests, "total_requests");
+
+            if (book == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            bookRepo.delete(book);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
         }
-
-        bookRepo.delete(book);
-
-        return ResponseEntity.ok().build();
     }
 
 }
