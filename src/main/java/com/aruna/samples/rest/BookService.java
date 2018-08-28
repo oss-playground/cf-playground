@@ -59,7 +59,7 @@ public class BookService {
 
         // setting up the counter for all request endpoints
         requests = Counter.build().name("requests_count").help("Total Number of Requests for each endpoint").
-                labelNames("endpoint", "type").register();
+                labelNames("endpoint", "type", "data").register();
 
 //        // setting up the histogram for request latency on all endpoints
 //        requestLatency = Histogram.build().name("requests_latency_seconds").help("Request latency in seconds.")..register();
@@ -71,7 +71,7 @@ public class BookService {
             description = "This is for retrieving all books from the API")
     public List<Book> getAllBooks() {
         try {
-            requests.labels("books.retrieveAll", "GET").inc();
+            requests.labels("books.retrieveAll", "GET", "").inc();
             pushGateway.pushAdd(requests, "requests_count");
             return (List<Book>) bookRepo.findAll();
         } catch (Exception e) {
@@ -90,7 +90,7 @@ public class BookService {
             System.out.println("book saved is " + savedBook);
 
             // first the count of the requests
-            requests.labels("books.create", "POST").inc();
+            requests.labels("books.create", "POST", "").inc();
             pushGateway.pushAdd(requests, "requests_count");
 
             URI location = uriBuilder.path("/api/v1/books/{id}").buildAndExpand(savedBook.getId()).toUri();
@@ -148,7 +148,7 @@ public class BookService {
         try {
             Optional<Book> bookOpt = Optional.ofNullable(bookRepo.findOne(id));
 
-            requests.labels("books.id", "PUT").inc();
+            requests.labels("books.id", "PUT", String.valueOf(id)).inc();
             pushGateway.pushAdd(requests, "requests_count");
 
             if (!bookOpt.isPresent())
@@ -168,7 +168,7 @@ public class BookService {
         try {
             Book book = bookRepo.findOne(id);
 
-            requests.labels("books.id", "DELETE").inc();
+            requests.labels("books.id", "DELETE", String.valueOf(id)).inc();
             pushGateway.pushAdd(requests, "requests_count");
 
             if (book == null) {
