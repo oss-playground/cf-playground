@@ -108,7 +108,7 @@ public class BookService {
             List<Book> books = bookRepo.findByTitle(bookTitle);
 
             // count of get books by title
-            requests.labels("books.title", "GET").inc();
+            requests.labels("books.title", "GET", bookTitle).inc();
             pushGateway.pushAdd(requests, "requests_count");
 
             if (books != null && books.size() > 0) {
@@ -128,7 +128,7 @@ public class BookService {
         try {
             Optional<Book> bookOpt = Optional.ofNullable(bookRepo.findOne(id));
 
-            requests.labels("books.id", "GET").inc();
+            requests.labels("books.id", "GET", id.toString()).inc();
             pushGateway.pushAdd(requests, "requests_count");
 
             if (bookOpt.isPresent()) {
