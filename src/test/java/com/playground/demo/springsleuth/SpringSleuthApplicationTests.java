@@ -1,4 +1,4 @@
-package com.demo.pushgateway.example;
+package com.playground.demo.springsleuth;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class ExampleApplicationTests {
+public class SpringSleuthApplicationTests {
 
     @Test
     public void contextLoads() {
