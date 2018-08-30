@@ -1,0 +1,11 @@
+---
+applications:
+- name: spring-sleuth-demo
+  memory: 1G
+  instances: 1
+  path: target/spring-sleuth-0.0.1-SNAPSHOT.jar
+  # services:
+  #   - msb-db
+  env:
+    JAVA_VERSION: 1.8.0_+
+
