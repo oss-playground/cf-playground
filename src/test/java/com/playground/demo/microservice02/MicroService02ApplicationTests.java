@@ -1,4 +1,4 @@
-package com.playground.demo.springsleuth;
+package com.playground.demo.microservice02;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class SpringSleuthApplicationTests {
+public class MicroService02ApplicationTests {
 
     @Test
     public void contextLoads() {

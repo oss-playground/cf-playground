@@ -1,12 +1,12 @@
-package com.playground.demo.springsleuth;
+package com.playground.demo.microservice02;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringSleuthApplication {
+public class MicroService02Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringSleuthApplication.class, args);
+        SpringApplication.run(MicroService02Application.class, args);
     }
 }

@@ -1,4 +1,4 @@
-package com.playground.demo.springsleuth.config;
+package com.playground.demo.microservice02.config;
 
 
 import org.springframework.context.annotation.Bean;

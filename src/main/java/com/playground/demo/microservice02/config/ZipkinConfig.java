@@ -1,9 +1,5 @@
-package com.playground.demo.springsleuth.config;
+package com.playground.demo.microservice02.config;
 
-import brave.sampler.Sampler;
-import org.springframework.cloud.sleuth.sampler.ProbabilityBasedSampler;
-import org.springframework.cloud.sleuth.sampler.SamplerProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration

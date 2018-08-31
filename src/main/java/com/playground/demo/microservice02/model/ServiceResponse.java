@@ -1,4 +1,4 @@
-package com.playground.demo.springsleuth.model;
+package com.playground.demo.microservice02.model;
 
 public class ServiceResponse {
 
