@@ -8,5 +8,6 @@ applications:
   #   - msb-db
   env:
     JAVA_VERSION: 1.8.0_+
-    ZIPKIN_SERVER: http://zipkin-server.apps.swat.lab-2.gaialab.jpmchase.net
+    ZIPKIN_SERVER:
+    DEMO_SERVICE_ONE: 
 
