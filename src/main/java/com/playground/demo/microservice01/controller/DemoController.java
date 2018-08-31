@@ -1,6 +1,6 @@
-package com.playground.demo.microservice02.controller;
+package com.playground.demo.microservice01.controller;
 
-import com.playground.demo.microservice02.model.ServiceResponse;
+import com.playground.demo.microservice01.model.ServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

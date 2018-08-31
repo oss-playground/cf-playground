@@ -1,6 +1,6 @@
 spring:
   application:
-    name: MicroService02
+    name: MicroService01
   zipkin:
     base-url: ${ZIPKIN_SERVER}
     enabled: true

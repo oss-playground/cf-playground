@@ -1,4 +1,4 @@
-package com.playground.demo.microservice02.model;
+package com.playground.demo.microservice01.model;
 
 public class ServiceResponse {
 
