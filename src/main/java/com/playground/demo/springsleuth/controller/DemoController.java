@@ -4,6 +4,7 @@ import com.playground.demo.springsleuth.model.ServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,9 @@ public class DemoController {
     @Autowired
     private RestTemplate restClient;
 
+    @Value("${server.port}")
+    private String appPort;
+
     @RequestMapping(value = "/metrics", method = RequestMethod.GET)
     public ResponseEntity<ServiceResponse> getMetricsEndpoint(HttpServletRequest request, HttpServletResponse response) {
         logger.info("/metrics API");
@@ -37,13 +41,13 @@ public class DemoController {
         String apiResp = "";
         try {
             if (!isLocal) {
-                apiResp = restClient.getForObject(System.getenv("DEMO_SERVICE_ONE") + "/metrics", String.class);
+                apiResp = restClient.getForObject(System.getenv("REMOTE_APP_URL") + "/metrics", String.class);
                 logger.info("LOCAL API RESPONSE: " + apiResp);
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ServiceResponse(HttpStatus.OK.value(), apiResp));
             }
 
-            apiResp = restClient.getForObject("http://localhost:8080/metrics", String.class);
+            apiResp = restClient.getForObject("http://localhost:" + this.appPort + "/metrics", String.class);
             logger.info("LOCAL API RESPONSE: " + apiResp);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ServiceResponse(HttpStatus.OK.value(), apiResp));
