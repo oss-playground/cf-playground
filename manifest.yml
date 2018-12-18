@@ -3,7 +3,7 @@ applications:
 - name: microService01
   memory: 1G
   instances: 1
-  path: target/microservice01-0.0.1-SNAPSHOT.jar
+  path: target/MicroService01.jar
   # services:
   #   - msb-db
   env:
