@@ -55,4 +55,20 @@ public class DemoController {
         }
     }
 
+    @RequestMapping(value = "/notrace", method = RequestMethod.GET)
+    public ResponseEntity<ServiceResponse> noTraceCall(HttpServletRequest request, HttpServletResponse response) {
+        logger.info("/notrace CALL");
+        String apiResp = "";
+        try {
+            apiResp = restClient.getForObject(System.getenv("DEMO_SERVICE_TWO") + "/metrics", String.class);
+            logger.info("noTrace API Response: " + apiResp);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ServiceResponse(HttpStatus.OK.value(), apiResp));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new ServiceResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
+        }
+    }
+
 }

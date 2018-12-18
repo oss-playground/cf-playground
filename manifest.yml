@@ -10,4 +10,5 @@ applications:
     JAVA_VERSION: 1.8.0_+
     ZIPKIN_SERVER:
     DEMO_SERVICE_ONE:
+    DEMO_SERVICE_TWO:
 
