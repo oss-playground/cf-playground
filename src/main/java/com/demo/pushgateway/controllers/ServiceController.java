@@ -19,7 +19,6 @@ public class ServiceController {
         try {
             System.out.println("Hello world!!");
             return ResponseEntity.ok(new ServiceResponse(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase()));
-
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
                     new ServiceResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase()));
