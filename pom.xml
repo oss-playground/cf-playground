@@ -84,7 +84,7 @@
     </dependencies>
 
     <build>
-        <finalName>MicroService03</finalName>
+        <finalName>MicroService04</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

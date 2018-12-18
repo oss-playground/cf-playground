@@ -1,8 +1,9 @@
 ---
 applications:
-- name: MicroService03
+- name: MicroService04
   memory: 1024M
   instances: 1
-  path: target/MicroService03.jar
+  path: target/MicroService04.jar
   env:
     JAVA_VERSION: 1.8.0_+
+    DEMO_SERVICE_ONE:
