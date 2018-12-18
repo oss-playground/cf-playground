@@ -1,9 +1,9 @@
 ---
 applications:
-- name: microservice02
+- name: MicroService02
   memory: 1G
   instances: 1
-  path: target/microservice02-0.0.1-SNAPSHOT.jar
+  path: target/MicroService02.jar
   # services:
   #   - msb-db
   env:
