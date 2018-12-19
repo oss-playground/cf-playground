@@ -13,7 +13,7 @@ import java.net.URI;
 import java.util.logging.Logger;
 
 @SpringBootApplication
-// @ComponentScan(basePackages = "com.demo.pushgateway.*")
+@ComponentScan(basePackages = "com.demo.pushgateway.example.*")
 @RestController
 public class ExampleApplication {
 
