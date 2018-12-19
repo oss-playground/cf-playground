@@ -29,6 +29,6 @@ public class ExampleApplication {
         RestTemplate rest = new RestTemplate();
         URI uri = URI.create("http://" + System.getenv("SS1_LINK") + "/metrics");
         log.info("Calling SS1@" + uri.toString());
-        return rest.getForObject(uri, String.class);
+        return rest.getForObject("http://" + System.getenv("SS1_LINK") + "/metrics", String.class);
     }
 }
