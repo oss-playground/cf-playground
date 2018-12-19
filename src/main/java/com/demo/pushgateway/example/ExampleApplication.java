@@ -24,7 +24,6 @@ public class ExampleApplication {
     }
 
     @RequestMapping("/call")
-
     public String home() {
         // ServiceInstance instance = lbClient.choose("ss1");
         RestTemplate rest = new RestTemplate();
