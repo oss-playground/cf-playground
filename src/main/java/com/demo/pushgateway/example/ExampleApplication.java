@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.util.logging.Logger;
 
@@ -24,7 +26,7 @@ public class ExampleApplication {
     }
 
     @RequestMapping("/metrics")
-    public String home() {
+    public String home(HttpServletRequest request, HttpServletResponse response) {
         // ServiceInstance instance = lbClient.choose("ss1");
         log.info("Handling SS1:/...");
         return String.format("ss1[%s]@%s; serverType:%s", "Test", "Test", "Test");
