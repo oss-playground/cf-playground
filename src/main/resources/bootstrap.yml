@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: ss1App
+  zipkin:
+    base-url: ${ZIPKIN_SERVER}
+    enabled: true
+  sleuth:
+    enabled: true
+    sampler:
+      probability: 1.0

@@ -1,6 +1,7 @@
 ---
 applications:
 - name: ss1-demo
+  buildpack: java_buildpack_beta
   memory: 1024M
   instances: 1
   path: target/ss1.jar
