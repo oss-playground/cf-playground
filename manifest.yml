@@ -1,6 +1,6 @@
 ---
 applications:
-- name: ss1
+- name: ss1-demo
   memory: 1024M
   instances: 1
   path: target/ss1.jar
