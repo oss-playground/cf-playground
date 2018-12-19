@@ -6,4 +6,5 @@ applications:
   path: target/ss2.jar
   env:
     JAVA_VERSION: 1.8.0_+
-    SS1_LINK: 
+    ZIPKIN_SERVER: zipkin-server.apps.dev.na-4b.gaia.jpmchase.net
+    SS1_LINK: ss1-demo.apps.dev.na-4b.gaia.jpmchase.net
