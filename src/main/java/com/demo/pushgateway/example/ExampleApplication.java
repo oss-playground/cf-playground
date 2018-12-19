@@ -23,13 +23,10 @@ public class ExampleApplication {
         SpringApplication.run(ExampleApplication.class, args);
     }
 
-    @RequestMapping("/call")
-
+    @RequestMapping("/metrics")
     public String home() {
         // ServiceInstance instance = lbClient.choose("ss1");
-        RestTemplate rest = new RestTemplate();
-        URI uri = URI.create("http://" + System.getenv("SS1_LINK") + "/metrics");
-        log.info("Calling SS1@" + uri.toString());
-        return rest.getForObject(uri, String.class);
+        log.info("Handling SS1:/...");
+        return String.format("ss1[%s]@%s; serverType:%s", "Test", "Test", "Test");
     }
 }

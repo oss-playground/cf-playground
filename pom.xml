@@ -83,7 +83,7 @@
     </dependencies>
 
     <build>
-        <finalName>ss2</finalName>
+        <finalName>ss1</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
