@@ -1,5 +1,6 @@
 package com.demo.pushgateway.example;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,6 +19,9 @@ import java.util.logging.Logger;
 @ComponentScan(basePackages = "com.demo.pushgateway.example.*")
 @RestController
 public class ExampleApplication {
+
+    @Autowired
+    private RestTemplate restClient;
 
     private static Logger log = Logger.getLogger(ExampleApplication.class.getName());
 
